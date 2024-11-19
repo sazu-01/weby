@@ -1,7 +1,7 @@
 
 //files
 import app from "./app.js";
-import ConnectDatabase from "./src/config/db.js";
+import ConnectDatabase from "./config/db.js";
 import { serverPort } from "./SecretEnv.js";
 
 

@@ -1,12 +1,11 @@
 
 
 import mongoose from "mongoose";
-import { MongodbUrl } from "../../SecretEnv.js";
+import { MongodbUrl } from "../SecretEnv.js";
 
 const ConnectDatabase = async function (options = {}) {
   try {
     const defaultOptions = {
-      useNewUrlParser: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,   // Timeout after 5 seconds
       family: 4,                        // Use IPv4, skip trying IPv6
