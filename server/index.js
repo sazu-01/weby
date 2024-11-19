@@ -1,11 +1,7 @@
 
-//import files
+//files
 import app from "./app.js";
-
-//database
 import ConnectDatabase from "./src/config/db.js";
-
-//env variables
 import { serverPort } from "./SecretEnv.js";
 
 

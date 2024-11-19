@@ -5,17 +5,17 @@ import { MongodbUrl } from "../../SecretEnv.js";
 
 const ConnectDatabase = async function (options = {}) {
   try {
-    // Default connection options optimized for Vercel environment
     const defaultOptions = {
       useNewUrlParser: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,   // Timeout after 5 seconds
       family: 4,                        // Use IPv4, skip trying IPv6
     };
-
+    
+    await mongoose.connect(MongodbUrl, { ...defaultOptions, ...options });
     console.log("Connected to Database successfully");
 
-    // Handle connection errors
+    //Handle connection errors
     mongoose.connection.on("error", function (error) {
       console.error("Database connection error:", error);
     });
