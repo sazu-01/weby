@@ -52,6 +52,8 @@ const ConnectDatabase = async function (options = {}) {
   try {
     // Default connection options optimized for Vercel environment
     const defaultOptions = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,   // Timeout after 5 seconds
       socketTimeoutMS: 45000,           // Close sockets after 45 seconds
