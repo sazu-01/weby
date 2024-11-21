@@ -11,7 +11,9 @@ const ConnectDatabase = async function (options = {}) {
       family: 4,                        // Use IPv4, skip trying IPv6
     };
     
-    await mongoose.connect(MongodbUrl, { ...defaultOptions, ...options });
+    const connectionOptions = {...defaultOptions, ...options}
+
+    await mongoose.connect(MongodbUrl, connectionOptions);
     console.log("Connected to Database successfully");
 
     //Handle connection errors
@@ -41,3 +43,5 @@ process.on("SIGINT", async () => {
 });
 
 export default ConnectDatabase;
+
+
