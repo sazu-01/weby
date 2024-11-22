@@ -5,27 +5,37 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
 import httpError from "http-errors";
+import cookieParser from "cookie-parser";
 
 //files
 import userRoute from "./routes/userRoute.js";
+import authRouter from "./routes/authRoute.js";
 import { ErrorResponse } from "./helpers/response.js";
 
 const app = express();
 
 const corsOptions = {
-  origin : ["http://localhost:5173"],
+  origin : ["http://localhost:5173", "https://weby-client.vercel.app"],
   credentials  : true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization',
+    'Access-Control-Allow-Credentials',
+    'X-Requested-With'
+  ],
 }
 
 //middlewares
 app.use(cors(corsOptions));
 app.use(morgan("dev"));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 //routes middlewares
 app.use("/api/user",userRoute);
+app.use("/api/auth",authRouter);
 
 //home route
 app.get("/", function (req, res) {
