@@ -1,12 +1,14 @@
 
 import express from "express";
 
-import {DeleteUser, GetAllUser, GetSingleUser, UpdateUser, CreateUser} 
+import { DeleteUser, GetAllUser, GetSingleUser, UpdateUser, CreateUser } 
 from "../controllers/userController.js";
 
+import { validateUserRegistration } from "../validation/userValidation.js";
+import RunValidation from "../validation/index.js";
 const userRoute = express.Router();
 
-userRoute.post("/create-user",CreateUser);
+userRoute.post("/create-user", validateUserRegistration , RunValidation, CreateUser);
 
 userRoute.get("/all-user", GetAllUser);
 
