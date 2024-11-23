@@ -5,7 +5,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 const Header = () => {
 
   const [isOpen, setIsOpen] = useState(false);
-
+  const isUserLoggedIn = localStorage.getItem("isLoggedIn");
   const menuItems = [
     { name: 'Templates', type: 'link', href: "/templates", },
     { name: 'Page Builder', type: 'dropdown', },
@@ -43,11 +43,12 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to={`/login`} className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            {!isUserLoggedIn && (<Link to={`/login`} className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
               Login
-            </Link>
-            <Link to={`/registration`} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-              Get Started
+            </Link>)}  
+
+            <Link to={isUserLoggedIn ? `Dashboard` : `/registration`} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+               {isUserLoggedIn ? `Dashboard` : `Get Started`}
             </Link>
           </div>
 
@@ -84,9 +85,9 @@ const Header = () => {
               <Link to={`/login`} onClick={() => setIsOpen(!isOpen)}
                 className="block w-full text-left px-3 py-2 text-base font-medium 
               text-gray-700 hover:text-gray-900">Login</Link>
-              <Link to={`/registration`} onClick={() => setIsOpen(!isOpen)}
+              <Link to={isUserLoggedIn ? `Dashboard` : `/registration`} onClick={() => setIsOpen(!isOpen)}
                 className="mt-1 block w-full text-left px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
-                Get Started
+                {isUserLoggedIn ? `Dashboard` : `Get Started`} 
               </Link>
             </div>
           </div>
