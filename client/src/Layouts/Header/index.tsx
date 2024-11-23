@@ -47,7 +47,7 @@ const Header = () => {
               Login
             </Link>)}  
 
-            <Link to={isUserLoggedIn ? `Dashboard` : `/registration`} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+            <Link to={isUserLoggedIn ? `/user-dashboard` : `/registration`} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                {isUserLoggedIn ? `Dashboard` : `Get Started`}
             </Link>
           </div>

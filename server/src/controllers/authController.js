@@ -98,13 +98,12 @@ export  const LogoutController = async (req, res, next) => {
 
 export const HandleRefreshToken = async (req, res, next) => {
   try {
-    console.log(req.cookies);
+ 
     //get the refresh token from req cookie
     const oldRefreshToken = req.cookies.refreshToken;
- 
     
     if (!oldRefreshToken) {
-      throw HttpError(401, "no refres token found, please login");
+      throw HttpError(401, "no refresh token found, please login");
     }
 
     //verify the refresh token
@@ -131,6 +130,9 @@ export const HandleRefreshToken = async (req, res, next) => {
     return SuccessResponse(res, {
       statusCode: 200,
       message: "new access token generated",
+      payload : {
+        accessToken
+      }
     });
   } catch (error) {
     next(error);

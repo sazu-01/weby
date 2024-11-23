@@ -30,7 +30,7 @@ export const login = createAsyncThunk("auth/login",
         return rejectWithValue(res.data.message || "Login failed");
       }
     } catch (error: any) {
-      console.log(error.response?.data?.message);
+      console.log(error.response);
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
 });
@@ -46,6 +46,7 @@ export const logout = createAsyncThunk("auth/logout",
       api.defaults.headers.common['Authorization'] = '';
       return res.data;
     } catch (error: any) {
+      console.log(error.response);
       return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
   }
@@ -59,7 +60,8 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser",
       const res = await api.get("/auth/get-user");
       return res.data.payload.user;
     } catch (error: any) {
-      localStorage.removeItem('isLoggedIn'); // Add this line
+      localStorage.removeItem('isLoggedIn');
+      console.log(error.response);
       return rejectWithValue(error.response?.data?.message);
     }
   });
@@ -67,25 +69,25 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser",
 
 let refreshTokenTimeout: any;
 
-// handle access token timeout
-const loadAccessTokenTimeout = (dispatch: any) => {
-    clearTimeout(refreshTokenTimeout);
-    refreshTokenTimeout = setTimeout(() => {
-        dispatch(loadAccessToken());
-    }, 55000); // Refresh 5 seconds before expiration
+const setAccessTokenRefreshTimeout = (dispatch: any) => {
+  clearTimeout(refreshTokenTimeout);
+  refreshTokenTimeout = setTimeout(() => {
+    dispatch(loadAccessToken());
+  }, 55000); // Trigger 5 seconds before expiration
 };
 
-//async thunk to load accessToken
-export const loadAccessToken = createAsyncThunk("/auth/loadAccessToken",
-  async (_, { rejectWithValue , dispatch }) => {
+export const loadAccessToken = createAsyncThunk(
+  "auth/loadAccessToken",
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      await api.get("/auth/refresh-token");
-      dispatch(loadAccessTokenTimeout);
+      await api.get("/auth/refresh-token"); // Calls your HandleRefreshToken endpoint
+      setAccessTokenRefreshTimeout(dispatch); // Schedule next refresh
     } catch (error: any) {
-      rejectWithValue(error.response?.data?.message)
+      console.log(error.response);
+      return rejectWithValue(error.response?.data?.message);
     }
   }
-)
+);
 
 
 //create authSlice
@@ -124,7 +126,7 @@ export const authSlice = createSlice({
         state.user = null;
         state.isLoading = false;
         state.error = null;
-        state.isLoggedIn = false; // Add this line
+        state.isLoggedIn = false; 
         clearTimeout(refreshTokenTimeout);
       })
       .addCase(logout.rejected, (state, action) => {
@@ -139,13 +141,13 @@ export const authSlice = createSlice({
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload as User;
-        state.isLoggedIn = true; // Add this line
+        state.isLoggedIn = true; 
 
       })
       .addCase(getCurrentUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string
-        state.isLoggedIn = false; // Add this line
+        state.isLoggedIn = false;
 
       })
 

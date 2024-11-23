@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx';
 
 import { Provider } from 'react-redux';
-import { store } from './app/store.ts';
+import { store } from './App/store.ts';
 
 //css
 import "../src/index.css";
