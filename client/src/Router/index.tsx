@@ -8,6 +8,8 @@ import UserDashboard from "../Pages/Auth/UserDashboard";
 import Login from "../Pages/Auth/Login";
 import Registration from "../Pages/Auth/Registration";
 import Templates from "../Pages/Templates";
+import { templatesData } from "../Components/Data/templatesData";
+import GetTemplateComponent from "../Components/GetTemplates";
 
 export const router = createBrowserRouter([
     {
@@ -34,6 +36,11 @@ export const router = createBrowserRouter([
                 path : "/user-dashboard",
                 element : <UserDashboard />
             },
+
+            ...templatesData.map((template)=>({
+                path : `templates/${template.link}`,
+                element : GetTemplateComponent(template.link)
+            }))
         ]
     },
     
