@@ -10,7 +10,9 @@ import cookieParser from "cookie-parser";
 //files
 import userRoute from "./routes/userRoute.js";
 import authRouter from "./routes/authRoute.js";
+import websiteRouter from "./routes/websiteRoute.js";
 import { ErrorResponse } from "./helpers/response.js";
+
 
 const app = express();
 
@@ -36,6 +38,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 //routes middlewares
 app.use("/api/user",userRoute);
 app.use("/api/auth",authRouter);
+app.use("/api/website",websiteRouter);
 
 //home route
 app.get("/", function (req, res) {
