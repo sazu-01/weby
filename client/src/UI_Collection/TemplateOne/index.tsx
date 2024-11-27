@@ -17,25 +17,29 @@ const TemplateOne = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-
+  const templateId = "p1";
+  
   // Fetch website name when component mounts
   useEffect(() => {
-    const fetchWebsiteData = async () => {
+    const fetchOrCreateWebsiteData = async () => {
       try {
-        const response = await api.get("/website/get", { params: { templateId: "p1" } });
-        if (response.data.payload.data && response.data.payload.data.length > 0) {
-          const latestData = response.data.payload.data[0];
-          setWebsiteName(latestData.websiteName);
-          setProfessionalTitle(latestData.professionalTitle);
-          setDocumentId(latestData._id); // Save the document ID for updates
+        const response = await api.post("/website/post", { templateId });
+
+        const data = response.data.payload;
+
+        if (data) {
+          setWebsiteName(data.websiteName);
+          setProfessionalTitle(data.professionalTitle);
+          setDocumentId(data._id);
         }
       } catch (error) {
         console.error("Error fetching website name:", error);
+        alert("error in creation website")
       }
     };
 
-    fetchWebsiteData();
-  }, []);
+    fetchOrCreateWebsiteData();
+  }, [templateId]);
 
   //check if user login or not
   const navigate = useNavigate();
@@ -44,25 +48,25 @@ const TemplateOne = () => {
     if (!isUserLoggedIn) {
       navigate('/login');
     }
-  }, [isUserLoggedIn, navigate])
+  }, [isUserLoggedIn, navigate]);
+
 
   //update the content by user
   const handleUpdate = async (e: FormEvent) => {
     e.preventDefault();
     if (!documentId) {
-      alert("No existing website name found to update!");
+      alert("No website to update!");
       return;
     }
     try {
-      const res = await api.put(`/website/update/${documentId}`,
+      const response = await api.put(`/website/update/${documentId}`,
         {
           websiteName,
           professionalTitle,
-          templateId: "p1"
+          templateId
         });
-      if (res.status === 200) {
-        setWebsiteName(websiteName);
-        setProfessionalTitle(professionalTitle)
+      if (response.status === 200) {
+        console.log('website updating successfull');
       }
     } catch (error) {
       console.error("Error updating website name:", error);
@@ -182,6 +186,7 @@ const TemplateOne = () => {
           <input
             id="websiteName"
             type="text"
+            value={websiteName}
             onChange={(e) => setWebsiteName(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
             placeholder={websiteName || "Enter new website name"}
@@ -193,6 +198,7 @@ const TemplateOne = () => {
           <input
             id="profesttion title"
             type="text"
+            value={professionalTitle}
             onChange={(e) => setProfessionalTitle(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:border-indigo-500"
             placeholder={"enter professional title"}

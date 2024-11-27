@@ -19,7 +19,7 @@ export const validateUserRegistration = [
     .isEmail()
     .withMessage("invalid email address"),
 
-    body("PhoneNumber")
+    body("PhoneNumber") 
     .trim()
     .notEmpty()
     .withMessage("phone number is required")
@@ -27,9 +27,8 @@ export const validateUserRegistration = [
     .withMessage("invalid bangladesh phone number formate"),
 
   body("AlterPhoneNumber")
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage("phone number is required")
     .matches(/^(\+880|880|0)1[3-9]\d{8}$/)
     .withMessage("invalid bangladesh phone number formate"),  
 

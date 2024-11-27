@@ -7,14 +7,14 @@ import { postWebsite, getSingleWebsite, updateWebsite, deleteWebsite, getWebsite
 from "../controllers/websiteController.js";
 
 //middlewares
-import { isAdmin, isLoggedIn } from "../middlewares/authMiddleware.js";
+import { isLoggedIn } from "../middlewares/authMiddleware.js";
 
 
 const formRouter = express.Router();
 
-formRouter.post("/post", isLoggedIn, isAdmin, postWebsite);
+formRouter.post("/post", isLoggedIn, postWebsite);
 
-formRouter.get("/get",getSingleWebsite);
+formRouter.get("/get",isLoggedIn, getSingleWebsite);
 
 formRouter.get("/all-website", getWebsites);
 

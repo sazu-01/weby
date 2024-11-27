@@ -7,9 +7,9 @@ import User from "../models/userModel.js";
 import { SuccessResponse, ErrorResponse } from "../helpers/response.js";
 
 
-export const CreateUser = async (req, res, next) => {
+export const CreateUser = async (req, res, next) => { 
     try {
-        const { Email, PhoneNumber } = req.body;
+        const { FullName, Email, PhoneNumber, Password } = req.body;
         
         const existUser = await User.findOne({$or : [{Email}, {PhoneNumber}]});
         
@@ -22,7 +22,7 @@ export const CreateUser = async (req, res, next) => {
         }
 
         //create a token with the user data
-        const userInfo = {...req.body};
+        const userInfo = { FullName, Email, PhoneNumber, Password };
 
         await User.create(userInfo);
         

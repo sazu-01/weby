@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MoreHorizontal, Filter, Search, Grid, List  } from 'lucide-react';
+import { Filter, Search, Grid, List  } from 'lucide-react';
 import { templatesData } from '../../Components/Data/templatesData';
 const Templates = () => {
   
@@ -62,8 +62,7 @@ const Templates = () => {
           : 'flex flex-col gap-4'}
       `}>
         {templatesData.map((template) => (
-          <Link 
-            to={template.link}
+          <div 
             key={template.id} 
             className={`
               group relative bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow
@@ -94,12 +93,13 @@ const Templates = () => {
                   <h3 className="text-lg font-medium text-gray-900">{template.title}</h3>
                   <p className="mt-1 text-sm text-gray-500">{template.status}</p>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MoreHorizontal className="w-5 h-5" />
-                </button>
+                <Link to={template.link} className="text-dark hover:text-gray-600 bg-green-400 px-2 py-1 rounded-md">
+                  Edit
+                </Link>
+
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </div>

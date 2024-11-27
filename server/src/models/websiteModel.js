@@ -1,3 +1,4 @@
+
 import { Schema, model } from "mongoose";
 
 const WebsiteSchema = new Schema({
@@ -13,7 +14,13 @@ const WebsiteSchema = new Schema({
     templateId : {
         type : String,
         required : true
-    }
+    },
+
+    userId : {
+        type : String,
+        required : true,
+    },
+
     
 },{timestamps:true})
 

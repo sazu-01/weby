@@ -20,7 +20,7 @@ const Register = () => {
   const UserRegistration = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const res = await api.post("/auth/registration", { FullName,  Email, PhoneNumber, Password })
+      const res = await api.post("/user/create-user", { FullName,  Email, PhoneNumber, Password })
       if (res.status === 200) alert(res.data.message)
     } catch (error: any) {
       setError(error.response.data.message)
