@@ -14,4 +14,8 @@ export const jwtRefreshKey= process.env.jwtRefreshKey;
 
 export const jwtAccessKey = process.env.jwtAccessKey;
 
+export const GOOGLE_CLIENT_ID = process.env.client_id;
+
+export const GOOGLE_CLIENT_SECRET = process.env.client_secret;
+
 

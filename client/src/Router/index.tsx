@@ -11,6 +11,8 @@ import Templates from "../Pages/Templates";
 import { templatesData } from "../Components/Data/templatesData";
 import GetTemplateComponent from "../Components/GetTemplates";
 
+import SetAuth from "../Components/SetAuth";
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -36,6 +38,10 @@ export const router = createBrowserRouter([
                 path : "/user-dashboard",
                 element : <UserDashboard />
             },
+            {
+                path: '/set-auth',
+                element: <SetAuth />,
+              },
 
             ...templatesData.map((template)=>({
                 path : `templates/${template.link}`,

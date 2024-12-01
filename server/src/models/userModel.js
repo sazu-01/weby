@@ -19,14 +19,11 @@ const userSchema = new Schema(
 
     PhoneNumber: {
       type: String,
-      unique: true,
-      required: true,
     },
 
     Password: {
       type: String,
       set: (v) => bcrypt.hashSync(v, bcrypt.genSaltSync(12)),
-      required : true,
     },
 
     AlterPhoneNumber: {

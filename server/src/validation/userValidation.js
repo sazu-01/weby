@@ -19,10 +19,8 @@ export const validateUserRegistration = [
     .isEmail()
     .withMessage("invalid email address"),
 
-    body("PhoneNumber") 
+    body("PhoneNumber")
     .trim()
-    .notEmpty()
-    .withMessage("phone number is required")
     .matches(/^(\+880|880|0)1[3-9]\d{8}$/)
     .withMessage("invalid bangladesh phone number formate"),
 
@@ -34,8 +32,6 @@ export const validateUserRegistration = [
 
   body("Password")
     .trim()
-    .notEmpty()
-    .withMessage("password is required")
     .isLength({ min: 6 })
     .withMessage("password should be at least 6 characters"),
 

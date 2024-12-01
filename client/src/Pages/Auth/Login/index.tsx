@@ -40,6 +40,8 @@ const Login = () => {
     }
 
   }
+
+
   return (
     <div className="flex justify-center items-center h-screen ">
       <form onSubmit={handleLogin} className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
@@ -76,6 +78,10 @@ const Login = () => {
         <button type="submit" className="mt-6 w-full bg-[#0266FF] text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
+
+        <Link to={`http://localhost:4000/api/auth/google`} className="my-2 block text-center bg-[#0266FF] text-white rounded-lg p-1">sign in with google</Link>
+
+
         <Link to={`/registration`} className="block text-center text-[#2077E7] mt-2 font-medium text-md">Don't have an account?</Link>
       </form>
     </div>

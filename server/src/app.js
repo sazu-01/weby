@@ -12,7 +12,7 @@ import userRoute from "./routes/userRoute.js";
 import authRouter from "./routes/authRoute.js";
 import websiteRouter from "./routes/websiteRoute.js";
 import { ErrorResponse } from "./helpers/response.js";
-
+import passport  from "./config/passport.js";
 
 const app = express();
 
@@ -34,6 +34,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(passport.initialize());
 
 //routes middlewares
 app.use("/api/user",userRoute);
