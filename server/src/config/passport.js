@@ -24,6 +24,7 @@ passport.use(
             Email: profile.emails[0].value,
             PhoneNumber : "",
             Image: profile.photos[0].value,
+            LoginMethod : "google",
           });
           await newUser.save();
           return done(null, newUser);

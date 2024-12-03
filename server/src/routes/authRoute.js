@@ -3,7 +3,7 @@ import express from "express";
 import passport from "passport";
 
 //controller
-import { LoginController, LogoutController, HandleRefreshToken, GetCurrentUser, HandleProtected }
+import { LoginController, LogoutController, HandleRefreshToken, GetCurrentUser, HandleProtected, CheckEmailController }
 from "../controllers/authController.js";
 
 //helpers
@@ -19,7 +19,8 @@ const authRouter = express.Router();
 
  authRouter.post("/logout", LogoutController);
 
- 
+ authRouter.post("/check-email", CheckEmailController);
+
  // Initiate Google authentication
  authRouter.get(
     "/google",

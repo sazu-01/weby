@@ -43,6 +43,12 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    LoginMethod : {
+      type : String,
+      enum : ["", "google"],
+      required : true
+    }
   },
   { timestamps: true }
 );

@@ -10,7 +10,7 @@ import Users from "../models/userModel.js";
 
 //import helper functions
 import { CreateJsonWebToken } from "../helpers/jwt.js";
-import { SuccessResponse } from "../helpers/response.js";
+import { ErrorResponse, SuccessResponse } from "../helpers/response.js";
 
 //environment variables
 import { jwtAccessKey, jwtRefreshKey } from "../SecretEnv.js";
@@ -19,6 +19,23 @@ import {
   SetRefreshTokenCookie,
 } from "../helpers/setCookie.js";
 
+
+export const CheckEmailController = async (req, res, next) => {
+  try {
+    const {Email} = req.body;
+    const user = await Users.findOne({ Email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found, Please Register" });
+    }
+
+    return SuccessResponse(res,{
+      success: true,
+      payload:  user.LoginMethod,
+    })
+  } catch (error) {
+    
+  }
+}
 
 export const LoginController = async (req, res, next) => {
   try {
@@ -32,17 +49,25 @@ export const LoginController = async (req, res, next) => {
       throw HttpError(404, "user does not exist , please register");
     }
 
-    //check the given password match or not
+    //if user banned
+    if (user.IsBanned) {
+      throw HttpError(403, "you are banned , please contact to authority");
+    }
+    
+    if(user.LoginMethod === "google"){
+      return ErrorResponse(res,{
+        success: false,
+        message: "This account is registered with Google. Please login via Google.",
+        redirect : "/api/google"
+      })
+    }
+
+    //For manual login, validate password
     const isPasswordMatch = await bcrypt.compare(Password, user.Password);
 
     //if password does not match throw error
     if (!isPasswordMatch) {
       throw HttpError(401, "passowrd is wrong");
-    }
-
-    //if user banned
-    if (user.IsBanned) {
-      throw HttpError(403, "you are banned , please contact to authority");
     }
 
     //create a jwt refresh token
