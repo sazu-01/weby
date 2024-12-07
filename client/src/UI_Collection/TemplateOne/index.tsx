@@ -1,15 +1,13 @@
 
-import { FormEvent, useState, useEffect } from "react";
-import { api } from "../../App/apiService";
-import { X, Home, User, Settings, Menu } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { X, Menu } from "lucide-react";
+export const Menus = ["Home", "About", "Services", "Contact"];
 
-const TemplateOne = () => {
+const TemplateOne = ({ websiteName, professionalTitle }: { 
+  websiteName: string, 
+  professionalTitle: string 
+}) => {
 
-  //state
-  const [websiteName, setWebsiteName] = useState("");
-  const [professionalTitle, setProfessionalTitle] = useState("");
-  const [documentId, setDocumentId] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   //toggle menu
@@ -17,62 +15,7 @@ const TemplateOne = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const templateId = "p1";
   
-  // Fetch website name when component mounts
-  useEffect(() => {
-    const fetchOrCreateWebsiteData = async () => {
-      try {
-        const response = await api.post("/website/post", { templateId });
-
-        const data = response.data.payload;
-
-        if (data) {
-          setWebsiteName(data.websiteName);
-          setProfessionalTitle(data.professionalTitle);
-          setDocumentId(data._id);
-        }
-      } catch (error) {
-        console.error("Error fetching website name:", error);
-        alert("error in creation website")
-      }
-    };
-
-    fetchOrCreateWebsiteData();
-  }, [templateId]);
-
-  //check if user login or not
-  const navigate = useNavigate();
-  const isUserLoggedIn = localStorage.getItem("isLoggedIn");
-  useEffect(() => {
-    if (!isUserLoggedIn) {
-      navigate('/login');
-    }
-  }, [isUserLoggedIn, navigate]);
-
-
-  //update the content by user
-  const handleUpdate = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!documentId) {
-      alert("No website to update!");
-      return;
-    }
-    try {
-      const response = await api.put(`/website/update/${documentId}`,
-        {
-          websiteName,
-          professionalTitle,
-          templateId
-        });
-      if (response.status === 200) {
-        console.log('website updating successfull');
-      }
-    } catch (error) {
-      console.error("Error updating website name:", error);
-      alert("Failed to update website data. Please try again.");
-    }
-  };
 
   return (
     <>
@@ -100,18 +43,11 @@ const TemplateOne = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
-              <a href="#" className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
-                Home
+              {Menus.map((menu, index)=>(
+              <a href="#" key={index} className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
+                {menu}
               </a>
-              <a href="#" className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
-                About
-              </a>
-              <a href="#" className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
-                Services
-              </a>
-              <a href="#" className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
-                Contact
-              </a>
+              ))}
             </nav>
 
             {/* Call to Action */}
@@ -129,31 +65,17 @@ const TemplateOne = () => {
         {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
           <div className="absolute z-10 top-full inset-x-0 transform shadow-lg md:hidden">
-            <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
+            <div className=" shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
               <div className="pt-5 pb-6 px-5">
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium text-gray-900">Menu</div>
-                  <button
-                    onClick={toggleMenu}
-                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
+ 
                 <div className="mt-6">
                   <nav className="grid gap-y-8">
+                    {Menus.map((menu)=>(
                     <a href="#" className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
-                      <Home className="flex-shrink-0 h-6 w-6 text-indigo-600" />
-                      <span className="ml-3 text-base font-medium text-gray-900">Home</span>
-                    </a>
-                    <a href="#" className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
-                      <User className="flex-shrink-0 h-6 w-6 text-indigo-600" />
-                      <span className="ml-3 text-base font-medium text-gray-900">About</span>
-                    </a>
-                    <a href="#" className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
-                      <Settings className="flex-shrink-0 h-6 w-6 text-indigo-600" />
-                      <span className="ml-3 text-base font-medium text-gray-900">Services</span>
-                    </a>
+                    <span className="ml-3 text-base font-medium text-gray-900">{menu}</span>
+                  </a>
+                    ))}
+
                   </nav>
                 </div>
                 <div className="mt-6">
@@ -177,43 +99,8 @@ const TemplateOne = () => {
           <p>{professionalTitle || "default title"}</p>
         </div>
       </main>
-      <form
-        onSubmit={handleUpdate}
-        className="text-center mt-12"
-      >
-        <div>
-          <label htmlFor="websiteName" className="mr-2">Update Website Name: </label>
-          <input
-            id="websiteName"
-            type="text"
-            value={websiteName}
-            onChange={(e) => setWebsiteName(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-            placeholder={websiteName || "Enter new website name"}
-          />
-        </div>
 
-        <div>
-          <label htmlFor="profesttionTitle" className="mr-2">Update professionalTitle: </label>
-          <input
-            id="profesttion title"
-            type="text"
-            value={professionalTitle}
-            onChange={(e) => setProfessionalTitle(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg mt-2 focus:outline-none focus:border-indigo-500"
-            placeholder={"enter professional title"}
-          />
-        </div>
-
-
-        <button
-          type="submit"
-          className="bg-yellow-400 py-2 px-4 rounded-md mt-4 hover:bg-yellow-500 transition"
-          disabled={!documentId}
-        >
-          Update Data
-        </button>
-      </form>
+    
     </>
   );
 };

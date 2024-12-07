@@ -5,6 +5,7 @@ import Header from "./Layouts/Header";
 
 import { Outlet, useLocation } from "react-router-dom";
 import { templatesData } from "./Components/Data/templatesData";
+import {TemplateEditor} from "./Components/TemplateEditor";
 
 const Root = () => {
 
@@ -17,8 +18,8 @@ const Root = () => {
 
   return (
     <>
-      {!isTemplatePage && <Header />} 
-      <Outlet />
+      {isTemplatePage ?  <TemplateEditor /> : <Header />} 
+      {!isTemplatePage && <Outlet /> } 
 
     </>
   )
