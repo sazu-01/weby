@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { resetAuth } from '../Features/authSlice';
 
 export const api = axios.create({
-  baseURL: "https://weby-server.vercel.app/api",
+  baseURL: "http://localhost:4000/api",
   withCredentials: true, // This is crucial for cookie handling
   headers: {
     'Content-Type': 'application/json',

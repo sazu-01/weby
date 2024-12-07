@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Monitor, Smartphone, X } from "lucide-react";
 import { api } from "../../App/apiService";
+import { useParams } from "react-router-dom";
 import TemplateOne from "../../UI_Collection/TemplateOne";
+import TemplateTwo from "../../UI_Collection/TemplateTwo";
 
 interface ModalProps {
   isModalOpen: boolean;
@@ -12,7 +14,7 @@ interface ModalProps {
 
 export const TemplateEditor: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
   return (
     <div className="flex flex-col h-screen">
       {/* Header Navigation */}
@@ -60,13 +62,17 @@ export const TemplateEditor: React.FC = () => {
   );
 };
 
+
+
 export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
   //state
   const [websiteName, setWebsiteName] = useState("");
   const [professionalTitle, setProfessionalTitle] = useState("");
   const [documentId, setDocumentId] = useState("");
 
-  const templateId = "p1";
+  //get templateId from useParams
+  const { templateId } = useParams();
+  
   const navigate = useNavigate();
 
   // Check if user is logged in
@@ -125,10 +131,16 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
   return (
     <>
       {/* Render TemplateOne outside of the modal to prevent duplicate rendering */}
-      <TemplateOne 
-        websiteName={websiteName} 
-        professionalTitle={professionalTitle} 
-      />
+{templateId === "p1" && <TemplateOne 
+    websiteName={websiteName} 
+    professionalTitle={professionalTitle} 
+/>}
+{templateId === "p2" && <TemplateTwo 
+    websiteName={websiteName} 
+    professionalTitle={professionalTitle} 
+/>}
+
+
 
       {/* Modal */}
       {isModalOpen && (

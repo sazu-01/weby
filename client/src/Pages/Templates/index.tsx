@@ -61,46 +61,50 @@ const Templates = () => {
           ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6' 
           : 'flex flex-col gap-4'}
       `}>
-        {templatesData.map((template) => (
-          <div 
-            key={template.id} 
-            className={`
-              group relative bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow
-              ${!isGridView && 'flex flex-col sm:flex-row'}
-            `}
-          >
-            {/* Template Preview Image */}
-            <div className={`
-              relative ${isGridView ? 'pb-[75%]' : 'pb-[50%] sm:pb-0 sm:w-48'}
-            `}>
-              <img
-                src={template.image}
-                alt={template.title}
-                className={`
-                  absolute inset-0 w-full h-full object-cover
-                  ${!isGridView && 'sm:relative sm:h-32'}
-                `}
-              />
-            </div>
-            
-            {/* Template Info */}
-            <div className={`
-              p-4 flex-grow
-              ${!isGridView && 'sm:flex sm:justify-between sm:items-center'}
-            `}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">{template.title}</h3>
-                  <p className="mt-1 text-sm text-gray-500">{template.status}</p>
-                </div>
-                <Link to={template.link} className="text-dark hover:text-gray-600 bg-green-400 px-2 py-1 rounded-md">
-                  Edit
-                </Link>
+        {templatesData.map((template, index) => {
 
+            const {templateId, image, title, status, link } = template;
+
+           return  (
+              <div 
+              key={index} 
+              className={`
+                group relative bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow
+                ${!isGridView && 'flex flex-col sm:flex-row'}
+              `}
+            >
+              {/* Template Preview Image */}
+              <div className={`
+                relative ${isGridView ? 'pb-[75%]' : 'pb-[50%] sm:pb-0 sm:w-48'}
+              `}>
+                <img
+                  src={image}
+                  alt={title}
+                  className={`
+                    absolute inset-0 w-full h-full object-cover
+                    ${!isGridView && 'sm:relative sm:h-32'}
+                  `}
+                />
+              </div>
+              
+              {/* Template Info */}
+              <div className={`
+                p-4 flex-grow
+                ${!isGridView && 'sm:flex sm:justify-between sm:items-center'}
+              `}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+                    <p className="mt-1 text-sm text-gray-500">{status}</p>
+                  </div>
+                  <Link to={`${link}/${templateId}`} className="text-dark hover:text-gray-600 bg-green-400 px-2 py-1 rounded-md">
+                    Edit
+                  </Link>
+  
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )})}
       </div>
     </div>
     </div>

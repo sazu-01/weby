@@ -5,14 +5,14 @@ import portfolio2 from "../../Assets/images/portfolio2.jpg";
 
 export const templatesData = [
     {
-      id: 1,
+      templateId: "p1",
       image: portfolio1,
       title: "My Site",
       link : "my-site",
       status: "https://pmizan2441.wi...",
     },
     {
-    id: 2,
+      templateId: "p2",
       image: portfolio2,
       title: "Techo",
       link : "techo",

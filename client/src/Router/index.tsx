@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
               },
 
             ...templatesData.map((template)=>({
-                path : `templates/${template.link}`,
+                path : `templates/${template.link}/:templateId`,
                 element : GetTemplateComponent(template.link)
             }))
         ]
