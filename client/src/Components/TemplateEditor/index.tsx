@@ -6,6 +6,8 @@ import { api } from "../../App/apiService";
 import { useParams } from "react-router-dom";
 import TemplateOne from "../../UI_Collection/TemplateOne";
 import TemplateTwo from "../../UI_Collection/TemplateTwo";
+import { Rnd } from "react-rnd";
+
 
 interface ModalProps {
   isModalOpen: boolean;
@@ -63,32 +65,25 @@ export const TemplateEditor: React.FC = () => {
 };
 
 
-
 export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
-  //state
   const [websiteName, setWebsiteName] = useState("");
   const [professionalTitle, setProfessionalTitle] = useState("");
   const [documentId, setDocumentId] = useState("");
 
-  //get templateId from useParams
   const { templateId } = useParams();
-  
   const navigate = useNavigate();
 
-  // Check if user is logged in
-  const isUserLoggedIn = localStorage.getItem("isLoggedIn");
   useEffect(() => {
+    const isUserLoggedIn = localStorage.getItem("isLoggedIn");
     if (!isUserLoggedIn) {
-      navigate('/login');
+      navigate("/login");
     }
-  }, [isUserLoggedIn, navigate]);
+  }, [navigate]);
 
-  // Fetch website data when component mounts
   useEffect(() => {
     const fetchOrCreateWebsiteData = async () => {
       try {
         const response = await api.post("/website/post", { templateId });
-
         const data = response.data.payload;
 
         if (data) {
@@ -105,7 +100,6 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
     fetchOrCreateWebsiteData();
   }, [templateId]);
 
-  // Update the content by user
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!documentId) {
@@ -116,10 +110,10 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
       const response = await api.put(`/website/update/${documentId}`, {
         websiteName,
         professionalTitle,
-        templateId
+        templateId,
       });
       if (response.status === 200) {
-        console.log('Website updating successful');
+        console.log("Website updating successful");
         setIsModalOpen(false); // Close the modal after successful update
       }
     } catch (error) {
@@ -130,8 +124,7 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
 
   return (
     <>
-      {/* Render TemplateOne outside of the modal to prevent duplicate rendering */}
-{templateId === "p1" && <TemplateOne 
+   {templateId === "p1" && <TemplateOne 
     websiteName={websiteName} 
     professionalTitle={professionalTitle} 
 />}
@@ -140,23 +133,35 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
     professionalTitle={professionalTitle} 
 />}
 
-
-
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Edit Site</h2>
+        <Rnd
+          default={{
+            x: window.innerWidth / 2 - 200, // Center horizontally
+            y: window.innerHeight / 2 - 200, // Center vertically
+            width: 400,
+            height: "auto",
+          }}
+          bounds="window" // Restrict movement to the viewport
+          enableResizing={false} // Disable resizing if not needed
+          dragHandleClassName="drag-handle" // Use a specific class as drag handle
+        >
+          <div className="bg-white rounded-lg shadow-xl p-6 relative box-border">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b pb-2 mb-4 drag-handle cursor-move">
+              <h2 className="text-xl font-bold">Edit Site</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <X />
+              </button>
+            </div>
+
+            {/* Modal Body */}
             <form onSubmit={handleUpdate} className="space-y-4">
               <div>
-                <label 
-                  htmlFor="websiteName" 
+                <label
+                  htmlFor="websiteName"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   Update Website Name
@@ -172,8 +177,8 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
               </div>
 
               <div>
-                <label 
-                  htmlFor="professionalTitle" 
+                <label
+                  htmlFor="professionalTitle"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   Update Professional Title
@@ -197,10 +202,11 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
               </button>
             </form>
           </div>
-        </div>
+        </Rnd>
       )}
     </>
   );
 };
+
 
 export default TemplateEditor;

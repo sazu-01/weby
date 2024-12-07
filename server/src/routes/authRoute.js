@@ -45,7 +45,7 @@ const authRouter = express.Router();
       SetRefreshTokenCookie(res, refreshToken);
   
       // Redirect to client
-      res.redirect("http://localhost:5173/set-auth?token=" + accessToken);
+      res.redirect("https://weby-client.vercel.app/set-auth?token=" + accessToken);
     }
   );
   
