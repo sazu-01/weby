@@ -1,15 +1,16 @@
 
 import { useState } from "react";
 import { X, Menu } from "lucide-react";
-export const Menus = ["Home", "About", "Services", "Contact"];
 
-const TemplateOne = ({ websiteName, professionalTitle }: { 
+
+const TemplateOne = ({ websiteName, professionalTitle, menus }: { 
   websiteName: string, 
-  professionalTitle: string 
+  professionalTitle: string
+  menus : string[] 
 }) => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  
   //toggle menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -43,7 +44,7 @@ const TemplateOne = ({ websiteName, professionalTitle }: {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
-              {Menus.map((menu, index)=>(
+              {menus?.map((menu, index)=>(
               <a href="#" key={index} className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
                 {menu}
               </a>
@@ -70,7 +71,7 @@ const TemplateOne = ({ websiteName, professionalTitle }: {
  
                 <div className="mt-6">
                   <nav className="grid gap-y-8">
-                    {Menus.map((menu)=>(
+                    {menus.map((menu)=>(
                     <a href="#" className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
                     <span className="ml-3 text-base font-medium text-gray-900">{menu}</span>
                   </a>

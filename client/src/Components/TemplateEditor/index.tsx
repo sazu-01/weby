@@ -68,8 +68,10 @@ export const TemplateEditor: React.FC = () => {
 export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
   const [websiteName, setWebsiteName] = useState("");
   const [professionalTitle, setProfessionalTitle] = useState("");
+  const [menus, setMenus] = useState<string[]>([]);
   const [documentId, setDocumentId] = useState("");
-
+ 
+  
   const { templateId } = useParams();
   const navigate = useNavigate();
 
@@ -85,11 +87,12 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
       try {
         const response = await api.post("/website/post", { templateId });
         const data = response.data.payload;
-
         if (data) {
           setWebsiteName(data.websiteName);
           setProfessionalTitle(data.professionalTitle);
+          setMenus(data.menus?.map((menu: any)=> menu.trim()));
           setDocumentId(data._id);
+ 
         }
       } catch (error) {
         console.error("Error fetching website name:", error);
@@ -110,8 +113,10 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
       const response = await api.put(`/website/update/${documentId}`, {
         websiteName,
         professionalTitle,
+        menus,
         templateId,
       });
+      console.log(response)
       if (response.status === 200) {
         console.log("Website updating successful");
         setIsModalOpen(false); // Close the modal after successful update
@@ -122,15 +127,41 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
     }
   };
 
+    // New function to update a specific menu
+    const handleMenuChange = async (index: number, newValue: string) => {
+      const updatedMenus = [...menus];
+      updatedMenus[index] = newValue;
+      setMenus(updatedMenus);      
+      if (documentId) {
+        try {
+          // Save updated menu to backend
+          const response = await api.put(`/website/update/${documentId}`, {
+            menus: updatedMenus, // Update only menus
+          });
+          if (response.status === 200) {
+            console.log("Menu updated successfully on the backend.");
+          }
+        } catch (error) {
+          console.error("Failed to update menu on the backend:", error);
+          alert("Error updating menu. Please try again.");
+        }
+      }
+    };
+    
+    
+   
   return (
     <>
    {templateId === "p1" && <TemplateOne 
     websiteName={websiteName} 
-    professionalTitle={professionalTitle} 
+    professionalTitle={professionalTitle}
+    menus={menus}
 />}
+
 {templateId === "p2" && <TemplateTwo 
     websiteName={websiteName} 
     professionalTitle={professionalTitle} 
+    menus={menus}
 />}
 
       {isModalOpen && (
@@ -191,6 +222,22 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                   placeholder="Enter professional title"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="" className="block text-sm font-medium text-gray-700 mb-2">
+                 Edit Menus
+                </label>
+                {menus.map((menu, index)=> (
+                  <div key={index} className="mb-2">
+                       <input type="text" 
+                        value={menu}
+                        onChange={(e)=>handleMenuChange(index, e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                        placeholder={`Menu ${index + 1}`}
+                       />
+                  </div>
+                ))}
               </div>
 
               <button

@@ -21,9 +21,12 @@ const WebsiteSchema = new Schema({
         required : true,
     },
 
+    menus : {
+        type : [String],
+    }
     
 },{timestamps:true})
 
-export const WebsiteModel = model("Websites",WebsiteSchema);
+const WebsiteModel = model("Websites",WebsiteSchema);
 
 export default WebsiteModel;
