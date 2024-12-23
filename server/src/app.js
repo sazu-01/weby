@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 //files
 import userRoute from "./routes/userRoute.js";
 import authRouter from "./routes/authRoute.js";
+import componentRouter from "./routes/compoentRoute.js";
 import websiteRouter from "./routes/websiteRoute.js";
 import { ErrorResponse } from "./helpers/response.js";
 import passport  from "./config/passport.js";
@@ -40,6 +41,7 @@ app.use(passport.initialize());
 app.use("/api/user",userRoute);
 app.use("/api/auth",authRouter);
 app.use("/api/website",websiteRouter);
+app.use("/api/components",componentRouter);
 
 //home route
 app.get("/", function (req, res) {

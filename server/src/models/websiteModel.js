@@ -2,14 +2,6 @@
 import { Schema, model } from "mongoose";
 
 const WebsiteSchema = new Schema({
-    
-    websiteName : {
-        type : String,
-    },
-
-    professionalTitle : {
-        type : String,
-    },
 
     templateId : {
         type : String,
@@ -20,10 +12,29 @@ const WebsiteSchema = new Schema({
         type : String,
         required : true,
     },
+    
+    pages : [{
+      name : {
+        type : String,
+        required : true,
+      },
+      components: [{
+        name: {
+            type : String
+        },
+        data: [{
+          path: {
+            type : String,
+          },
+          value: {
+            type : Schema.Types.Mixed,
+          },
+        _id : false
+        }],
+        _id : false
+      }]
+    }],
 
-    menus : {
-        type : [String],
-    }
     
 },{timestamps:true})
 
