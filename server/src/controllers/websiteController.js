@@ -71,14 +71,9 @@ export const postWebsite = async (req, res, next) => {
 
 export const getSingleWebsite = async (req, res, next) => {
   try {
-    const { templateId } = req.query;
-
-    const userId = req.user._id;
+    const { id } = req.params;
     
-    const singleWebsite = await WebsiteModel.find({ templateId, userId }).sort({
-      createdAt: -1,
-    });
-
+    const singleWebsite = await WebsiteModel.findById({ _id : id  });
 
     return SuccessResponse(res, {
       statusCode: 200,
@@ -93,7 +88,6 @@ export const getSingleWebsite = async (req, res, next) => {
 export const getWebsites = async (req, res, next) => {
   try {
     const websites = await WebsiteModel.find({})
-        
     
     return SuccessResponse(res, {
       statusCode: 200,

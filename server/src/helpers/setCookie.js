@@ -5,7 +5,7 @@
 export const SetAccessTokenCookie = (res, accessToken) => {
     const isProduction = process.env.NODE_ENV === "production";
     return res.cookie("accessToken", accessToken, {
-        maxAge: 1 * 60 * 1000, //1 minutes
+        maxAge: 10 * 60 * 1000, //10 minutes
         httpOnly: true,
         secure: true,
         sameSite: isProduction ? "none" : "lax"

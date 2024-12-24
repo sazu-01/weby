@@ -14,7 +14,7 @@ const formRouter = express.Router();
 
 formRouter.post("/post", isLoggedIn, postWebsite);
 
-formRouter.get("/get",isLoggedIn, getSingleWebsite);
+formRouter.get("/get/:id", isLoggedIn, getSingleWebsite);
 
 formRouter.get("/all-website", getWebsites);
 
