@@ -1,6 +1,6 @@
 
 
-import { SuccessResponse } from "../helpers/response.js";
+import { ErrorResponse, SuccessResponse } from "../helpers/response.js";
 import WebsiteModel from "../models/websiteModel.js";
 import ComponentModel from "../models/componentModel.js";
 
@@ -103,11 +103,66 @@ export const getWebsites = async (req, res, next) => {
 
 export const updateWebsite = async (req, res, next) => {
   try {
-    
+    const { websiteId, pages } = req.body;
+    const userId = req.user._id;
+
+    const website = await WebsiteModel.findOne({ _id: websiteId, userId });
+    if (!website) {
+      throw new Error('Website not found or unauthorized');
+    }
+
+    // Create a map of pages to update
+    const updatedPagesMap = new Map(pages.map(page => [page._id.toString(), page]));
+
+    // Update only specified pages while preserving others
+    const updatedPages = website.pages.map(existingPage => {
+      const pageToUpdate = updatedPagesMap.get(existingPage._id.toString());
+      
+      if (!pageToUpdate) {
+        return existingPage; // Keep unchanged pages as is
+      }
+
+      // Create component updates map
+      const updatedComponentsMap = new Map(
+        pageToUpdate.components?.map(comp => [comp.name, comp]) || []
+      );
+
+      return {
+        _id: existingPage._id,
+        name: pageToUpdate.name || existingPage.name,
+        components: existingPage.components.map(existingComponent => {
+          const componentUpdate = updatedComponentsMap.get(existingComponent.name);
+          
+          if (!componentUpdate) {
+            return existingComponent; // Keep unchanged components as is
+          }
+
+          // Create data updates map
+          const updatedDataMap = new Map(
+            componentUpdate.data?.map(item => [item.path, item]) || []
+          );
+
+          return {
+            name: existingComponent.name,
+            data: existingComponent.data.map(existingData => {
+              const dataUpdate = updatedDataMap.get(existingData.path);
+              return dataUpdate || existingData; // Update only specified data
+            })
+          };
+        })
+      };
+    });
+
+    const updatedWebsite = await WebsiteModel.findByIdAndUpdate(
+      websiteId,
+      { $set: { pages: updatedPages } },
+      { new: true }
+    );
+
     return SuccessResponse(res, {
       statusCode: 200,
-      message: "Website data updated successfully",
-      payload: "update website successfull",
+      message: "Website updated successfully",
+      payload: updatedWebsite
     });
   } catch (error) {
     next(error);
