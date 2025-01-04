@@ -1,8 +1,12 @@
 
+import { useAppSelector } from "../../App/hook";
 
-export const CoverOne = ({ professionalTitle }: {
-    professionalTitle: string
-}) => {
+
+
+export const CoverOne = () => {
+
+      const {professionalTitle} = useAppSelector((state)=> state.website);
+
     return (
         <>
             <main className="p-5 h-auto bg-green-600">
@@ -16,9 +20,11 @@ export const CoverOne = ({ professionalTitle }: {
 }
 
 
-export const CoverTwo = ({professionalTitle} : {
-    professionalTitle : string
-}) => {
+export const CoverTwo = () => {
+
+  const {professionalTitle} = useAppSelector((state)=> state.website);
+
+
   return (
     <>
           <main className="p-5 h-auto bg-sky-600">

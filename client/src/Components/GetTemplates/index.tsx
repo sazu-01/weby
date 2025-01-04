@@ -7,10 +7,10 @@ import DemoTemplate from "../../UI_Collection/DemoTemplate";
 export default function GetTemplateComponent(templateName: any) {
     switch (templateName) {
         case "my-site":
-            return <TemplateOne websiteName={``} professionalTitle={``} menus={['']} />
+            return <TemplateOne  />
 
         case "techo":
-            return <TemplateTwo websiteName={``} professionalTitle={``} menus={['']} />
+            return <TemplateTwo />
 
         case "my-site-5":
             return <DemoTemplate />

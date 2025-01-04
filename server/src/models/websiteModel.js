@@ -16,7 +16,9 @@ const WebsiteSchema = new Schema({
     pages : [{
       name : {
         type : String,
-        required : true,
+      },
+      slug : {
+        type : String,
       },
       components: [{
         name: {
@@ -29,9 +31,7 @@ const WebsiteSchema = new Schema({
           value: {
             type : Schema.Types.Mixed,
           },
-        _id : false
         }],
-        _id : false
       }]
     }],
 

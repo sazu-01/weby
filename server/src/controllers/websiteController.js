@@ -1,6 +1,6 @@
 
-
-import { ErrorResponse, SuccessResponse } from "../helpers/response.js";
+import mongoose from "mongoose";
+import { SuccessResponse } from "../helpers/response.js";
 import WebsiteModel from "../models/websiteModel.js";
 import ComponentModel from "../models/componentModel.js";
 
@@ -45,6 +45,7 @@ export const postWebsite = async (req, res, next) => {
 
         return {
           name: page.name,
+          slug : page.slug,
           components: processedComponents
         };
       })
@@ -71,7 +72,7 @@ export const postWebsite = async (req, res, next) => {
 
 export const getSingleWebsite = async (req, res, next) => {
   try {
-    const { templateId } = req.body;
+    const { templateId } = req.query;
     const  userId  = req.user._id;
     
     const singleWebsite = await WebsiteModel.findOne({ templateId, userId }).sort({
@@ -104,67 +105,47 @@ export const getWebsites = async (req, res, next) => {
   }
 };
 
-export const updateWebsite = async (req, res, next) => {
+
+export const updateComponentValue = async (req, res, next) => {
   try {
-    const { websiteId, pages } = req.body;
+    const { dataId, newValue } = req.body;
     const userId = req.user._id;
 
-    const website = await WebsiteModel.findOne({ _id: websiteId, userId });
-    if (!website) {
-      throw new Error('Website not found or unauthorized');
-    }
+        // Validate that dataId is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(dataId)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid data ID format"
+          });
+        }
 
-    // Create a map of pages to update
-    const updatedPagesMap = new Map(pages.map(page => [page._id.toString(), page]));
-
-    // Update only specified pages while preserving others
-    const updatedPages = website.pages.map(existingPage => {
-      const pageToUpdate = updatedPagesMap.get(existingPage._id.toString());
-      
-      if (!pageToUpdate) {
-        return existingPage; // Keep unchanged pages as is
+    // Update the specific data item using its _id
+    const updatedWebsite = await WebsiteModel.findOneAndUpdate(
+      {
+        userId,
+        "pages.components.data._id": dataId
+      },
+      {
+        $set: {
+          "pages.$[].components.$[].data.$[data].value": newValue
+        }
+      },
+      {
+        arrayFilters: [{ "data._id": dataId }],
+        new: true
       }
-
-      // Create component updates map
-      const updatedComponentsMap = new Map(
-        pageToUpdate.components?.map(comp => [comp.name, comp]) || []
-      );
-
-      return {
-        _id: existingPage._id,
-        name: pageToUpdate.name || existingPage.name,
-        components: existingPage.components.map(existingComponent => {
-          const componentUpdate = updatedComponentsMap.get(existingComponent.name);
-          
-          if (!componentUpdate) {
-            return existingComponent; // Keep unchanged components as is
-          }
-
-          // Create data updates map
-          const updatedDataMap = new Map(
-            componentUpdate.data?.map(item => [item.path, item]) || []
-          );
-
-          return {
-            name: existingComponent.name,
-            data: existingComponent.data.map(existingData => {
-              const dataUpdate = updatedDataMap.get(existingData.path);
-              return dataUpdate || existingData; // Update only specified data
-            })
-          };
-        })
-      };
-    });
-
-    const updatedWebsite = await WebsiteModel.findByIdAndUpdate(
-      websiteId,
-      { $set: { pages: updatedPages } },
-      { new: true }
     );
 
-    return SuccessResponse(res, {
-      statusCode: 200,
-      message: "Website updated successfully",
+    if (!updatedWebsite) {
+      return res.status(404).json({
+        success: false,
+        message: "Data item not found or unauthorized"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Component data updated successfully",
       payload: updatedWebsite
     });
   } catch (error) {

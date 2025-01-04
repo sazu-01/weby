@@ -3,7 +3,7 @@
 import express from "express";
 
 //controllers
-import { postWebsite, getSingleWebsite, updateWebsite, deleteWebsite, getWebsites } 
+import { postWebsite, getSingleWebsite, updateComponentValue, deleteWebsite, getWebsites } 
 from "../controllers/websiteController.js";
 
 //middlewares
@@ -18,7 +18,7 @@ formRouter.get("/get", isLoggedIn, getSingleWebsite);
 
 formRouter.get("/all-website", getWebsites);
 
-formRouter.put("/update/:id", isLoggedIn, updateWebsite);
+formRouter.patch('/update-data', isLoggedIn, updateComponentValue);
 
 formRouter.delete("/delete/:id", isLoggedIn, deleteWebsite);
 

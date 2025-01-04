@@ -1,12 +1,14 @@
 
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../../App/apiService";
+import { useAppDispatch, useAppSelector } from "../../App/hook";
 import TemplateOne from "../../UI_Collection/TemplateOne";
 import TemplateTwo from "../../UI_Collection/TemplateTwo";
 import { Rnd } from "react-rnd";
 import { X } from "lucide-react";
+import { api } from "../../App/apiService";
+import { fetchOrCreateWebsiteData, updateComponentValue } from "../../Features/websiteSlice";
 
 
 interface ModalProps {
@@ -15,15 +17,19 @@ interface ModalProps {
   }
 
 export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
-    const [websiteName, setWebsiteName] = useState("");
-    const [professionalTitle, setProfessionalTitle] = useState("");
-    const [menus, setMenus] = useState<string[]>([]);
-    const [documentId, setDocumentId] = useState("");
-   
+
+    
+    const { websiteName, professionalTitle, menus } = 
+    useAppSelector((state)=> state.website);
+    console.log(websiteName);
+    
+    const {user} = useAppSelector((state)=> state.auth);
+    const userId = user?._id;
     
     const { templateId } = useParams();
     const navigate = useNavigate();
-  
+    const dispatch = useAppDispatch();
+
     useEffect(() => {
       const isUserLoggedIn = localStorage.getItem("isLoggedIn");
       if (!isUserLoggedIn) {
@@ -31,87 +37,121 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
       }
     }, [navigate]);
   
-    useEffect(() => {
-      const fetchOrCreateWebsiteData = async () => {
-        try {
-          const response = await api.post("/website/post", { templateId });
-          const data = response.data.payload;
-          if (data) {
-            setWebsiteName(data.websiteName);
-            setProfessionalTitle(data.professionalTitle);
-            setMenus(data.menus?.map((menu: any)=> menu.trim()));
-            setDocumentId(data._id);
-   
-          }
-        } catch (error) {
-          console.error("Error fetching website name:", error);
-          alert("Error in creating website");
-        }
-      };
-  
-      fetchOrCreateWebsiteData();
-    }, [templateId]);
-  
-    const handleUpdate = async (e: React.FormEvent) => {
+ 
+    useEffect(()=>{
+      if(templateId)
+      dispatch(fetchOrCreateWebsiteData(templateId))
+    },[templateId]);
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!documentId) {
-        alert("No website to update!");
-        return;
-      }
+      
       try {
-        const response = await api.put(`/website/update/${documentId}`, {
-          websiteName,
-          professionalTitle,
-          menus,
-          templateId,
-        });
-        console.log(response)
-        if (response.status === 200) {
-          console.log("Website updating successful");
-          setIsModalOpen(false); // Close the modal after successful update
+    
+        if (!userId || !templateId) {
+          throw new Error('Missing user ID or template ID');
         }
+        
+        // Get the current website data
+        const response = await api.get(`/website/get?templateId=${templateId}`);
+
+        if (!response.data.payload.singleWebsite) {
+          throw new Error('Website not found');
+        }
+
+        const websiteData = response.data.payload.singleWebsite;
+        const homePage = websiteData.pages.find((page : any) => page.name === "Home");
+        
+        if (!homePage) {
+          throw new Error('Home page not found');
+        }
+        
+        // Find the header component
+        const headerComponent = homePage.components.find(
+          (comp: any) => comp.name === "HeaderOne" || comp.name === "HeaderTwo"
+        );
+        
+        // Find the cover component
+        const coverComponent = homePage.components.find(
+          (comp: any)=> comp.name === "CoverOne" || comp.name === "CoverTwo"
+        );
+        
+        // Get the specific data IDs
+        const websiteNameData = headerComponent?.data.find((item:any) => item.path === "websiteName");
+        const navigationData = headerComponent?.data.find((item:any) => item.path === "Navigation");
+        const titleData = coverComponent?.data.find((item:any) => item.path === "professionalTitle");
+        
+        // Create an array of update promises
+        const updatePromises = [];
+        
+        // Only push updates if we have valid IDs
+        if (websiteNameData?._id) {
+          updatePromises.push(
+            dispatch(updateComponentValue({
+              dataId: websiteNameData._id,
+              newValue: websiteName
+            })).unwrap()
+          );
+        }
+        
+        if (titleData?._id) {
+          updatePromises.push(
+            dispatch(updateComponentValue({
+              dataId: titleData._id,
+              newValue: professionalTitle
+            })).unwrap()
+          );
+        }
+        
+        if (navigationData?._id) {
+          updatePromises.push(
+            dispatch(updateComponentValue({
+              dataId: navigationData._id,
+              newValue: menus
+            })).unwrap()
+          );
+        }
+        
+        // Wait for all updates to complete
+        await Promise.all(updatePromises);
+        
+        setIsModalOpen(false);
       } catch (error) {
-        console.error("Error updating website name:", error);
-        alert("Failed to update website data. Please try again.");
+        console.error('Failed to update components:', error);
+        // You might want to show an error message to the user here
       }
     };
   
-      // New function to update a specific menu
-      const handleMenuChange = async (index: number, newValue: string) => {
-        const updatedMenus = [...menus];
-        updatedMenus[index] = newValue;
-        setMenus(updatedMenus);      
-        if (documentId) {
-          try {
-            // Save updated menu to backend
-            const response = await api.put(`/website/update/${documentId}`, {
-              menus: updatedMenus, // Update only menus
-            });
-            if (response.status === 200) {
-              console.log("Menu updated successfully on the backend.");
-            }
-          } catch (error) {
-            console.error("Failed to update menu on the backend:", error);
-            alert("Error updating menu. Please try again.");
-          }
-        }
-      };
-      
-      
+
+
+    const handleWebsiteNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch({
+        type: 'website/updateWebsiteName',
+        payload: e.target.value
+      });
+    };
+  
+    const handleProfessionalTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch({
+        type: 'website/updateProfessionalTitle',
+        payload: e.target.value
+      });
+    };
+  
+    const handleMenuChange = (index: number, value: string) => {
+      dispatch({
+        type: 'website/updateMenu',
+        payload: { index, value }
+      });
+    };
+    
      
     return (
       <>
-     {templateId === "p1" && <TemplateOne 
-      websiteName={websiteName} 
-      professionalTitle={professionalTitle}
-      menus={menus}
-  />}
+     {templateId === "p1" && <TemplateOne  />}
   
-  {templateId === "p2" && <TemplateTwo 
-      websiteName={websiteName} 
-      professionalTitle={professionalTitle} 
-      menus={menus}
-  />}
+     {templateId === "p2" && <TemplateTwo />}
   
         {isModalOpen && (
           <Rnd
@@ -137,8 +177,8 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                 </button>
               </div>
   
-              {/* Modal Body */}
-              <form onSubmit={handleUpdate} className="space-y-4">
+              {/*update data Modal Body */}
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label
                     htmlFor="websiteName"
@@ -150,7 +190,7 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                     id="websiteName"
                     type="text"
                     value={websiteName}
-                    onChange={(e) => setWebsiteName(e.target.value)}
+                    onChange={handleWebsiteNameChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                     placeholder={websiteName || "Enter new website name"}
                   />
@@ -167,7 +207,7 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                     id="professionalTitle"
                     type="text"
                     value={professionalTitle}
-                    onChange={(e) => setProfessionalTitle(e.target.value)}
+                    onChange={handleProfessionalTitleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                     placeholder="Enter professional title"
                   />
@@ -177,11 +217,11 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                   <label htmlFor="" className="block text-sm font-medium text-gray-700 mb-2">
                    Edit Menus
                   </label>
-                  {menus.map((menu, index)=> (
+                  {menus?.map((menu, index)=> (
                     <div key={index} className="mb-2">
                          <input type="text" 
                           value={menu}
-                          onChange={(e)=>handleMenuChange(index, e.target.value)}
+                          onChange={(e) => handleMenuChange(index, e.target.value)}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
                           placeholder={`Menu ${index + 1}`}
                          />
@@ -192,7 +232,6 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
                 <button
                   type="submit"
                   className="w-full bg-yellow-400 py-2 px-4 rounded-md hover:bg-yellow-500 transition"
-                  disabled={!documentId}
                 >
                   Update Data
                 </button>

@@ -1,12 +1,11 @@
 
 import { useState } from "react";
 import { X, Menu } from "lucide-react";
-
-
-export const HeaderOne = ({ websiteName, menus }: { 
-    websiteName: string, 
-    menus : string[] 
-  }) => {
+import { useAppSelector } from "../../App/hook";
+import { Link } from "react-router-dom";
+export const HeaderOne = () => {
+    
+    const {websiteName, menus} = useAppSelector((state)=> state.website);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -43,9 +42,9 @@ export const HeaderOne = ({ websiteName, menus }: {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
               {menus?.map((menu, index)=>(
-              <a href="#" key={index} className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
+              <Link to={`/${menu}`} key={index} className="text-base font-medium text-white hover:text-blue-200 transition duration-300">
                 {menu}
-              </a>
+              </Link>
               ))}
             </nav>
 
@@ -69,10 +68,10 @@ export const HeaderOne = ({ websiteName, menus }: {
  
                 <div className="mt-6">
                   <nav className="grid gap-y-8">
-                    {menus.map((menu)=>(
-                    <a href="#" className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
+                    {menus?.map((menu, index)=>(
+                    <Link to={`/${menu.toLowerCase()}`} key={index} className="flex items-center p-3 -m-3 hover:bg-gray-50 rounded-lg">
                     <span className="ml-3 text-base font-medium text-gray-900">{menu}</span>
-                  </a>
+                  </Link>
                     ))}
 
                   </nav>
@@ -97,12 +96,10 @@ export const HeaderOne = ({ websiteName, menus }: {
 
 
 
-export const HeaderTwo = ({ websiteName, menus }: { 
-    websiteName: string, 
-    menus : string[] 
-  }) => {
+export const HeaderTwo = () => {
 
     const [isOpen, setIsOpen] = useState(false);
+    const {websiteName, menus} = useAppSelector((state)=> state.website);
 
     return (
         <>
@@ -118,9 +115,9 @@ export const HeaderTwo = ({ websiteName, menus }: {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
               {menus?.map((menu, index) => (
-                <a href="#" key={index} className="block text-gray-600 hover:text-gray-900">
+                <Link to={`/${menu}`} key={index} className="block text-gray-600 hover:text-gray-900">
                   {menu}
-                </a>
+                </Link>
               ))}
             </nav>
 
@@ -153,9 +150,9 @@ export const HeaderTwo = ({ websiteName, menus }: {
             <div className="md:hidden">
               <nav className="space-y-4">
                 {menus?.map((menu, index)=> (
-                   <a href="#" key={index} className="block text-gray-600 hover:text-gray-900">
+                   <Link to={`/${menu}`} key={index} className="block text-gray-600 hover:text-gray-900">
                     {menu}
-                   </a>
+                   </Link>
                 ))}
                
                
