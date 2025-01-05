@@ -15,6 +15,7 @@ interface ComponentData {
   interface Page {
     _id: string;
     name: string;
+    slug : string;
     components: Component[];
   }
   
@@ -28,8 +29,9 @@ interface ComponentData {
  export interface initialStateType {
      isLoading : boolean,
      error : null | string,
-     homePage : string[]
      websiteName : string,
      professionalTitle : string;
-     menus : string[]
+     menus : string[],
+     pages : Page[],
+     website : Website | null
  } 

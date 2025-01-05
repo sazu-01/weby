@@ -1,6 +1,6 @@
 
 import mongoose from "mongoose";
-import { SuccessResponse } from "../helpers/response.js";
+import { ErrorResponse, SuccessResponse } from "../helpers/response.js";
 import WebsiteModel from "../models/websiteModel.js";
 import ComponentModel from "../models/componentModel.js";
 
@@ -147,6 +147,169 @@ export const updateComponentValue = async (req, res, next) => {
       success: true,
       message: "Component data updated successfully",
       payload: updatedWebsite
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addPage = async (req, res, next) => {
+  try {
+    const { websiteId, pageName, slug, components } = req.body;
+    const userId = req.user._id;
+
+    // Validate websiteId format
+    if (!mongoose.Types.ObjectId.isValid(websiteId)) {
+      return ErrorResponse(res,{
+        statusCode: 400,
+        success: false,
+        message: "Invalid website ID format"
+      });
+    }
+
+    // Find the website and verify ownership
+    const website = await WebsiteModel.findOne({
+      _id: websiteId,
+      userId
+    });
+
+    if (!website) {
+      return ErrorResponse(res,{
+        statusCode: 404,
+        success: false,
+        message: "Website not found or unauthorized"
+      });
+    }
+
+    // Check if page with same name or slug already exists
+    const pageExists = website.pages.some(
+      page => page.name === pageName || page.slug === slug
+    );
+
+    if (pageExists) {
+      return ErrorResponse(res,{
+        statusCode: 400,
+        success: false,
+        message: "Page with this name or slug already exists"
+      });
+    }
+     
+    // Process components and get their default data
+    const processedComponents = await Promise.all(
+      components.map(async (componentName) => {
+        const originalComponent = await ComponentModel.findOne({ name: componentName });
+        
+        if (!originalComponent) {
+          throw new Error(`Component ${componentName} not found`);
+        }
+        
+        return {
+          name: originalComponent.name,
+          data: originalComponent.data.map(item => ({
+            path: item.path,
+            value: item.value
+          }))
+        };
+      })
+    );
+
+    // Create new page object
+    const newPage = {
+      name: pageName,
+      slug: slug,
+      components: processedComponents
+    };
+
+    // Add the new page to the website
+    website.pages.push(newPage);
+    await website.save();
+
+    return SuccessResponse(res,{
+      statusCode: 200,
+      message: "Page added successfully",
+      payload: website
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deletePage = async (req, res, next) => {
+  try {
+    const { websiteId, pageId } = req.body;
+    const userId = req.user._id;
+
+    // Validate websiteId format
+    if (!mongoose.Types.ObjectId.isValid(websiteId)) {
+      return ErrorResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Invalid website ID format"
+      });
+    }
+
+    // Validate pageId format
+    if (!mongoose.Types.ObjectId.isValid(pageId)) {
+      return ErrorResponse(res, {
+        statusCode : 400,
+        success: false,
+        message: "Invalid page ID format"
+      });
+    }
+
+    // Find the website and verify ownership
+    const website = await WebsiteModel.findOne({
+      _id: websiteId,
+      userId
+    });
+
+    if (!website) {
+      return ErrorResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Website not found or unauthorized"
+      });
+    }
+
+    // Check if it's the only page
+    if (website.pages.length === 1) {
+      return ErrorResponse(res,{
+        statusCode: 400,
+        success: false,
+        message: "Cannot delete the only page of the website"
+      });
+    }
+
+    // Check if page exists
+    const pageIndex = website.pages.findIndex(
+      page => page._id.toString() === pageId
+    );
+
+    if (pageIndex === -1) {
+      return ErrorResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Page not found"
+      });
+    }
+
+    // Check if trying to delete home page
+    if (website.pages[pageIndex].slug === "/") {
+      return ErrorResponse(res,{
+        statusCode: 400,
+        success: false,
+        message: "Cannot delete the home page"
+      });
+    }
+
+    // Remove the page
+    website.pages.splice(pageIndex, 1);
+    await website.save();
+
+    return SuccessResponse(res,{
+      statusCode: 200,
+      message: "Page deleted successfully",
+      payload: website
     });
   } catch (error) {
     next(error);
