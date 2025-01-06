@@ -106,6 +106,55 @@ export const deletePage = createAsyncThunk(
   }
 );
 
+// add component thunk 
+export const addComponentToPage = createAsyncThunk(
+  "website/addComponent", async ({ 
+    websiteId, 
+    pageId, 
+    componentName 
+  }: { 
+    websiteId: string | undefined;
+    pageId: string;
+    componentName: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/website/add-component", {
+        websiteId,
+        pageId,
+        componentName
+      });
+      return response.data.payload;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add component");
+    }
+  }
+);
+
+//remove component thunk
+export const removeComponentFromPage = createAsyncThunk(
+  "website/removeComponent", async ({
+    websiteId,
+    pageId,
+    componentId
+  }: {
+    websiteId: string | undefined;
+    pageId: string;
+    componentId: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/website/remove-component", {
+        websiteId,
+        pageId,
+        componentId
+      });
+      console.log(response);
+      return response.data.payload;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to remove component");
+    }
+  }
+);
+
 
 export const websiteSlice = createSlice({
   name: "website",
@@ -240,7 +289,37 @@ export const websiteSlice = createSlice({
       .addCase(deletePage.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-      });
+      })
+      
+      // Add component to page
+      .addCase(addComponentToPage.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(addComponentToPage.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.website = action.payload;
+        state.pages = action.payload.pages;
+      })
+      .addCase(addComponentToPage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
+      //remove component from page
+      .addCase(removeComponentFromPage.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(removeComponentFromPage.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.website = action.payload;
+        state.pages = action.payload.pages;
+      })
+      .addCase(removeComponentFromPage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
       
   },
 });

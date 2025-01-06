@@ -316,6 +316,152 @@ export const deletePage = async (req, res, next) => {
   }
 };
 
+export const addComponentToPage = async (req, res, next) => {
+  try {
+    const { websiteId, pageId, componentName } = req.body;
+    const userId = req.user._id;
+
+    // Validate input
+    if (!websiteId || !pageId || !componentName) {
+      return res.status(400).json({
+        success: false,
+        message: "websiteId, pageId and componentName are required"
+      });
+    }
+
+    // Find website and verify ownership
+    const website = await WebsiteModel.findOne({
+      _id: websiteId,
+      userId
+    });
+
+    if (!website) {
+      return res.status(404).json({
+        success: false,
+        message: "Website not found or unauthorized"
+      });
+    }
+
+    // Find the page
+    const pageIndex = website.pages.findIndex(
+      page => page._id.toString() === pageId
+    );
+
+    if (pageIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Page not found"
+      });
+    }
+
+    // Find the component template
+    const componentTemplate = await ComponentModel.findOne({ name: componentName });
+    if (!componentTemplate) {
+      return res.status(404).json({
+        success: false,
+        message: "Component template not found"
+      });
+    }
+
+    // Check if component already exists on the page
+    const componentExists = website.pages[pageIndex].components.some(
+      comp => comp.name === componentName
+    );
+
+    if (componentExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Component already exists on this page"
+      });
+    }
+
+    // Create new component with default data
+    const newComponent = {
+      name: componentTemplate.name,
+      data: componentTemplate.data.map(item => ({
+        path: item.path,
+        value: item.value
+      }))
+    };
+
+    // Add component to the page
+    website.pages[pageIndex].components.push(newComponent);
+    await website.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Component added successfully",
+      payload: website
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const removeComponentFromPage = async (req, res, next) => {
+  try {
+    const { websiteId, pageId, componentId } = req.body;
+    const userId = req.user._id;
+
+    // Validate input
+    if (!websiteId || !pageId || !componentId) {
+      return res.status(400).json({
+        success: false,
+        message: "websiteId, pageId and componentId are required"
+      });
+    }
+
+    // Find website and verify ownership
+    const website = await WebsiteModel.findOne({
+      _id: websiteId,
+      userId
+    });
+
+    if (!website) {
+      return res.status(404).json({
+        success: false,
+        message: "Website not found or unauthorized"
+      });
+    }
+
+    // Find the page
+    const pageIndex = website.pages.findIndex(
+      page => page._id.toString() === pageId
+    );
+
+    if (pageIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Page not found"
+      });
+    }
+
+    // Find and remove the component
+    const componentIndex = website.pages[pageIndex].components.findIndex(
+      comp => comp._id.toString() === componentId
+    );
+
+    if (componentIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Component not found on this page"
+      });
+    }
+
+    // Remove the component
+    website.pages[pageIndex].components.splice(componentIndex, 1);
+    await website.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Component removed successfully",
+      payload: website
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const deleteWebsite = async (req, res, next) => {
   try {

@@ -9,8 +9,10 @@ import {
     updateComponentValue, 
     deleteWebsite, 
     getWebsites, 
-    addPage, 
-    deletePage
+    addPage,
+    deletePage,
+    addComponentToPage,
+    removeComponentFromPage
 } 
 from "../controllers/websiteController.js";
 
@@ -23,6 +25,10 @@ const formRouter = express.Router();
 formRouter.post("/post", isLoggedIn, postWebsite);
 
 formRouter.post("/add-page", isLoggedIn, addPage);
+
+formRouter.post('/add-component', isLoggedIn, addComponentToPage);
+
+formRouter.post("/remove-component", isLoggedIn, removeComponentFromPage);
 
 formRouter.get("/get", isLoggedIn, getSingleWebsite);
 

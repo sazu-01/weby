@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { Monitor, Smartphone} from "lucide-react";
 import { Modal } from "../EditModal";
 import EditPages from "../EditPages";
+import { GetComponents } from "../Getcomponetns";
 
 
 export const TemplateEditor: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditPagesOpen, setIsEditPagesOpen] = useState(false);
+  const [isGetCompoenentOpen, setIsGetComponentOpen] = useState(false);
   
   return (
     <div className="flex flex-col h-screen">
@@ -36,6 +38,12 @@ export const TemplateEditor: React.FC = () => {
           </button>
           <button
             className="text-[#9F42BD] font-semibold cursor-pointer"
+            onClick={() => setIsGetComponentOpen(true)}
+          >
+            Edit Components
+          </button>
+          <button
+            className="text-[#9F42BD] font-semibold cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           >
             Edit Site
@@ -59,6 +67,7 @@ export const TemplateEditor: React.FC = () => {
       <div className="flex-grow">
         <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
         <EditPages isEditPagesOpen={isEditPagesOpen} setIsEditPagesOpen={setIsEditPagesOpen} />
+        <GetComponents isGetCompoenentOpen={isGetCompoenentOpen} setIsGetComponentOpen={setIsGetComponentOpen} /> 
       </div>
     </div>
   );

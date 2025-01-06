@@ -16,7 +16,6 @@ interface EditPagesProps {
   
   const { pages, isLoading } = useAppSelector((state) => state.website);
   const { website } = useAppSelector((state) => state.website);
-
   const websiteId = website?._id;
 
  
