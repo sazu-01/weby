@@ -3,12 +3,10 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../App/hook";
-import TemplateOne from "../../UI_Collection/TemplateOne";
-import TemplateTwo from "../../UI_Collection/TemplateTwo";
 import { Rnd } from "react-rnd";
 import { X } from "lucide-react";
 import { api } from "../../App/apiService";
-import { fetchOrCreateWebsiteData, updateComponentValue } from "../../Features/websiteSlice";
+import { updateComponentValue } from "../../Features/websiteSlice";
 
 
 interface ModalProps {
@@ -21,7 +19,6 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
     
     const { websiteName, professionalTitle, menus } = 
     useAppSelector((state)=> state.website);
-    console.log(websiteName);
     
     const {user} = useAppSelector((state)=> state.auth);
     const userId = user?._id;
@@ -37,11 +34,7 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
       }
     }, [navigate]);
   
- 
-    useEffect(()=>{
-      if(templateId)
-      dispatch(fetchOrCreateWebsiteData(templateId))
-    },[templateId]);
+
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -149,9 +142,6 @@ export const Modal: React.FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => 
      
     return (
       <>
-     {templateId === "p1" && <TemplateOne  />}
-  
-     {templateId === "p2" && <TemplateTwo />}
   
         {isModalOpen && (
           <Rnd
